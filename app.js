@@ -1,88 +1,189 @@
 'use strict';
-/* CyberShield: micrositio informativo de una pantalla, sin conexión con el backend. */
-const scenarios = {
-  1: { title:'Fuerza bruta', overview:'Identifica ráfagas de intentos de autenticación y facilita la aplicación de límites de acceso.', defense:'El receptor de laboratorio aplica un límite de solicitudes y rechaza el intento que lo supera.', evidence:'Denegación HTTP 429, acción LAB_HTTP_RATE_LIMIT y registro asociado al incidente.', mitre:'MITRE ATT&CK · T1110' },
-  2: { title:'Dispositivo no autorizado', overview:'Evalúa la confianza del equipo desde el que se solicita acceso, además de la identidad del usuario.', defense:'Device Trust restringe un identificador de dispositivo que no está registrado como confiable.', evidence:'Decisión de acceso restringido y acción RESTRICT_DEVICE_ACCESS vinculadas al incidente.', mitre:'MITRE ATT&CK · T1078' },
-  3: { title:'Cambio de archivo crítico', overview:'Relaciona cambios en archivos con controles de integridad y protección de escritura.', defense:'Se aplican permisos de solo lectura al archivo señuelo del entorno controlado.', evidence:'Permisos comprobados, huellas SHA-256 y acción PROTECT_CRITICAL_FILE.', mitre:'MITRE ATT&CK · T1565.001' },
-  4: { title:'Abuso de privilegios', overview:'Controla solicitudes de operaciones administrativas que exceden los permisos permitidos.', defense:'La pasarela de laboratorio rechaza las operaciones protegidas cuando no están autorizadas.', evidence:'Dos rechazos HTTP 403 y acción LAB_PRIVILEGE_DENY con resultado verificado.', mitre:'Control de autorización' },
-  5: { title:'Conexión sospechosa', overview:'Permite evaluar solicitudes que buscan salir hacia destinos no incluidos en una política de acceso.', defense:'La política de la pasarela HTTP impide el reenvío hacia un destino no autorizado.', evidence:'Respuesta HTTP 403, constancia de no reenvío y acción LAB_EGRESS_POLICY_DENY.', mitre:'Control de conexiones' },
-  6: { title:'Exfiltración de datos', overview:'Asocia el volumen de transferencia con decisiones de restricción del flujo de información.', defense:'Se limita la transferencia de datos de prueba y se deniegan bloques adicionales.', evidence:'Conteo de bytes, huellas SHA-256, denegación HTTP 403 y acción LAB_TRANSFER_QUOTA_DENY.', mitre:'MITRE ATT&CK · T1041' },
-  7: { title:'Actividad tipo ransomware', overview:'Analiza operaciones repetitivas sobre archivos que pueden afectar su disponibilidad e integridad.', defense:'El control del receptor frena nuevos renombrados de archivos de prueba.', evidence:'Denegación HTTP 423, hashes de contenido y acción LAB_RENAME_GUARD.', mitre:'Integridad de archivos' },
-  8: { title:'Movimiento lateral', overview:'Observa solicitudes de paso entre nodos e identifica intentos de acceso interno no autorizados.', defense:'La política de la pasarela rechaza los intentos de acceso SSH representados en el laboratorio.', evidence:'Dos rechazos HTTP 403 y acción LAB_LATERAL_SSH_DENY, sin conexión SSH hacia otro nodo.', mitre:'MITRE ATT&CK · T1021.004' }
-};
-const headings = {
-  escenarios: ['EXPLORA NUESTRA DEFENSA','8 escenarios. <em>Una visión integral.</em>','01 / 04'],
-  capacidades: ['LO QUE NOS DISTINGUE','Funciones que <em>conectan los puntos.</em>','02 / 04'],
-  arquitectura: ['NUESTRA BASE TECNOLÓGICA','Tecnología con <em>propósito.</em>','03 / 04'],
-  preguntas: ['ENTIENDE CYBERSHIELD','Las respuestas <em>más importantes.</em>','04 / 04']
-};
-const $ = (id) => document.getElementById(id);
-const tabs = [...document.querySelectorAll('[data-view]')];
-const panes = [...document.querySelectorAll('.view-pane')];
-function changeView(name) {
-  if (!headings[name]) return;
-  tabs.forEach(tab => {let active=tab.dataset.view===name;tab.classList.toggle('active',active);tab.setAttribute('aria-pressed',String(active));});
-  panes.forEach(pane=>{const active=pane.id==='view-'+name;pane.classList.toggle('active',active);pane.hidden=!active;});
-  $('view-eyebrow').textContent=headings[name][0];
-  $('view-title').innerHTML=headings[name][1];
-  $('view-index').textContent=headings[name][2];
-}
-tabs.forEach(tab=>tab.addEventListener('click',()=>changeView(tab.dataset.view)));
-$('brand-home').addEventListener('click',(e)=>{e.preventDefault();changeView('escenarios');resetInspector();});
-function resetInspector() {
-  $('inspector-summary').hidden=false;
-  $('inspector-detail').hidden=true;
-  $('inspector-eyebrow').textContent='EL VALOR DE CYBERSHIELD';
-  document.querySelectorAll('[data-scenario]').forEach(el=>el.classList.remove('selected'));
-}
-function setData(prefix,number,s){
-  $(prefix+'title').textContent=s.title;
-  $(prefix+'overview').textContent=s.overview;
-  $(prefix+'defense').textContent=s.defense;
-  $(prefix+'evidence').textContent=s.evidence;
-  $(prefix+'mitre').textContent=s.mitre;
-  if(prefix==='detail-')$('detail-number').textContent='ESCENARIO / '+String(number).padStart(2,'0');
-  if(prefix==='drawer-')$('drawer-nr').textContent='ESCENARIO / '+String(number).padStart(2,'0');
-}
-let lastFocus = null;
-function isCompact() { return window.matchMedia('(max-width: 1050px)').matches; }
-function showScenario(number) {
-  const s=scenarios[number]; if(!s)return;
-  lastFocus=document.activeElement;
-  document.querySelectorAll('[data-scenario]').forEach(el=>el.classList.toggle('selected',el.dataset.scenario===String(number)));
-  setData('detail-',number,s);
-  $('inspector-summary').hidden=true;
-  $('inspector-detail').hidden=false;
-  $('inspector-eyebrow').textContent='ANÁLISIS DE ESCENARIO';
-  if(isCompact()){
-    setData('drawer-',number,s);
-    $('drawer-backdrop').hidden=false;
-    $('mobile-drawer').hidden=false;
-    document.body.classList.add('drawer-open');
-    $('close-drawer').focus();
+
+// CyberShield: sitio informativo estático. No se conecta al backend ni solicita datos privados.
+const steps = [
+  {
+    icon: 'ico-radar', tag: 'SEÑAL IDENTIFICADA',
+    title: 'Cada incidente comienza con una señal.',
+    description: 'CyberShield recibe y organiza información de seguridad para reconocer actividad relevante.'
+  },
+  {
+    icon: 'ico-brain', tag: 'RIESGO CONTEXTUALIZADO',
+    title: 'Convertimos datos en información útil.',
+    description: 'Las reglas, la severidad y las técnicas MITRE ATT&CK permiten comprender mejor el incidente.'
+  },
+  {
+    icon: 'ico-shield', tag: 'MEDIDA REGISTRADA',
+    title: 'La respuesta forma parte del proceso.',
+    description: 'Cada medida defensiva se asocia al incidente correspondiente y conserva su estado de ejecución.'
+  },
+  {
+    icon: 'ico-search', tag: 'RESULTADO COMPROBADO',
+    title: 'Actuar importa. Verificar también.',
+    description: 'La plataforma relaciona el resultado de la medida con comprobaciones concretas y registros técnicos.'
+  },
+  {
+    icon: 'ico-check', tag: 'EVIDENCIA CONSERVADA',
+    title: 'Un cierre respaldado por evidencia.',
+    description: 'El incidente puede consultarse con su estado, acción, verificación y trazabilidad para futuras revisiones.'
   }
+];
+
+const scenarios = {
+  1: {
+    name: 'Fuerza bruta',
+    description: 'Una secuencia de intentos de autenticación puede revelar actividad que requiere atención y límites de acceso.',
+    action: 'Detecta solicitudes reiteradas, las clasifica y activa la política de límite de intentos del receptor de laboratorio.',
+    proof: 'Respuesta HTTP 429 ante una solicitud que excede el límite, con asociación al incidente y su acción defensiva.',
+    mitre: 'MITRE ATT&CK · T1110'
+  },
+  2: {
+    name: 'Dispositivo no autorizado',
+    description: 'No basta con identificar a un usuario: también importa la confianza del dispositivo desde el que solicita acceso.',
+    action: 'Evalúa un identificador de equipo mediante Device Trust y restringe el acceso cuando no está registrado o autorizado.',
+    proof: 'Decisión de acceso restringido registrada y correlacionada con la acción RESTRICT_DEVICE_ACCESS.',
+    mitre: 'MITRE ATT&CK · T1078'
+  },
+  3: {
+    name: 'Cambio de archivo crítico',
+    description: 'La integridad de archivos relevantes requiere identificar cambios y conservar una referencia verificable.',
+    action: 'Registra cambios en archivos señuelo y aplica una protección de escritura sobre el archivo controlado.',
+    proof: 'Permisos del archivo comprobados y huellas SHA-256 asociadas a la evidencia técnica del incidente.',
+    mitre: 'MITRE ATT&CK · T1565.001'
+  },
+  4: {
+    name: 'Abuso de privilegios',
+    description: 'Una solicitud de operación administrativa fuera de los permisos autorizados debe ser rechazada y documentada.',
+    action: 'Evalúa solicitudes de una operación protegida y aplica una política de denegación de permisos.',
+    proof: 'Dos rechazos HTTP 403 y registro de la medida LAB_PRIVILEGE_DENY con resultado verificado.',
+    mitre: 'Control · privilegios'
+  },
+  5: {
+    name: 'Conexión saliente sospechosa',
+    description: 'Las solicitudes hacia destinos que no forman parte de una política de salida merecen una evaluación de seguridad.',
+    action: 'Inspecciona solicitudes de prueba de una pasarela HTTP y niega un reenvío hacia un destino no permitido.',
+    proof: 'Denegación HTTP 403, constancia de que no hubo reenvío y acción LAB_EGRESS_POLICY_DENY.',
+    mitre: 'Control · conexiones de salida'
+  },
+  6: {
+    name: 'Exfiltración de datos',
+    description: 'El volumen y el destino de las transferencias pueden aportar señales para limitar movimientos de información.',
+    action: 'Gestiona una transferencia de datos sintéticos y aplica un límite de volumen en el receptor.',
+    proof: 'Conteo de bytes, huellas SHA-256 y rechazo HTTP 403 al superar el límite configurado.',
+    mitre: 'MITRE ATT&CK · T1041'
+  },
+  7: {
+    name: 'Actividad tipo ransomware',
+    description: 'Cambios masivos y rápidos sobre archivos pueden ser señales de riesgo para su disponibilidad e integridad.',
+    action: 'Observa renombrados de archivos señuelo y detiene nuevos renombrados mediante un control de acceso del laboratorio.',
+    proof: 'Rechazo HTTP 423 y comprobación del contenido de los archivos mediante SHA-256.',
+    mitre: 'Control · integridad de archivos'
+  },
+  8: {
+    name: 'Movimiento lateral',
+    description: 'Los intentos de pasar de un nodo a otro deben respetar las políticas de acceso interno y quedar registrados.',
+    action: 'Evalúa solicitudes de salto entre nodos del laboratorio y aplica una política de denegación de acceso.',
+    proof: 'Dos intentos rechazados con HTTP 403 y evidencia asociada a LAB_LATERAL_SSH_DENY.',
+    mitre: 'MITRE ATT&CK · T1021.004'
+  }
+};
+
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+const menuButton = $('#menu-toggle');
+const menu = $('#main-nav');
+const setMenu = (open) => {
+  if (!menu || !menuButton) return;
+  menu.classList.toggle('open', open);
+  menuButton.setAttribute('aria-expanded', String(open));
+  menuButton.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+};
+menuButton?.addEventListener('click', () => setMenu(!menu.classList.contains('open')));
+$$('#main-nav a').forEach(link => link.addEventListener('click', () => setMenu(false)));
+document.addEventListener('keydown', event => { if (event.key === 'Escape') setMenu(false); });
+document.addEventListener('click', event => { if (menu?.classList.contains('open') && !event.target.closest('.site-header')) setMenu(false); });
+
+function selectStep(index, focus = false) {
+  const step = steps[index];
+  if (!step) return;
+  $$('.journey-step').forEach((button, position) => {
+    const active = position === index;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-selected', String(active));
+    button.tabIndex = active ? 0 : -1;
+  });
+  $('#journey-panel').setAttribute('aria-labelledby', `tab-${index}`);
+  $('#journey-count').textContent = `${String(index + 1).padStart(2, '0')} / 05`;
+  $('#journey-tag').textContent = step.tag;
+  $('#journey-title').textContent = step.title;
+  $('#journey-description').textContent = step.description;
+  $('#journey-icon use').setAttribute('href', `#${step.icon}`);
+  $$('.journey-progress i').forEach((bar, position) => bar.classList.toggle('filled', position <= index));
+  if (focus) $(`#tab-${index}`).focus();
 }
-function closeDrawer() {
-  $('drawer-backdrop').hidden=true;
-  $('mobile-drawer').hidden=true;
-  document.body.classList.remove('drawer-open');
-  if(lastFocus&&typeof lastFocus.focus==='function')lastFocus.focus();
-}
-document.querySelectorAll('[data-scenario]').forEach(card=>card.addEventListener('click',()=>showScenario(Number(card.dataset.scenario))));
-$('return-summary').addEventListener('click',resetInspector);
-$('close-drawer').addEventListener('click',closeDrawer);
-$('drawer-done').addEventListener('click',closeDrawer);
-$('drawer-backdrop').addEventListener('click',closeDrawer);
-document.addEventListener('keydown', e=>{if(e.key==='Escape'&&!$('mobile-drawer').hidden)closeDrawer();});
-window.addEventListener('resize',()=>{if(!isCompact()&&!$('mobile-drawer').hidden)closeDrawer();});
-let toastTimeout;
-function toast(message){const el=$('toast');el.textContent=message;el.classList.add('visible');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove('visible'),2500);}
-$('share').addEventListener('click',async()=>{
-  const url=window.location.href;
-  try{
-    if(navigator.share){await navigator.share({title:'CyberShield',text:'Descubre CyberShield: detección, respuesta y evidencia.',url});return;}
-    if(navigator.clipboard && window.isSecureContext){await navigator.clipboard.writeText(url);toast('Enlace copiado.');return;}
-    const txt=document.createElement('textarea');txt.value=url;txt.style.cssText='position:fixed;opacity:0';document.body.append(txt);txt.select();let ok=document.execCommand('copy');txt.remove();toast(ok?'Enlace copiado.':'Copia el enlace desde el navegador.');
-  }catch(e){if(e.name!=='AbortError')toast('Puedes copiar el enlace desde el navegador.');}
+$$('.journey-step').forEach(button => {
+  button.addEventListener('click', () => selectStep(Number(button.dataset.step)));
+  button.addEventListener('keydown', event => {
+    if (!['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const current = Number(button.dataset.step);
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? 4 : (current + (['ArrowDown', 'ArrowRight'].includes(event.key) ? 1 : -1) + 5) % 5;
+    selectStep(next, true);
+  });
 });
-changeView('escenarios');
+
+$$('.filter-chip').forEach(button => button.addEventListener('click', () => {
+  const filter = button.dataset.filter;
+  $$('.filter-chip').forEach(chip => {
+    const selected = chip === button;
+    chip.classList.toggle('active', selected);
+    chip.setAttribute('aria-pressed', String(selected));
+  });
+  $$('.scenario-card').forEach(card => {
+    card.hidden = filter !== 'all' && card.dataset.category !== filter;
+  });
+}));
+
+const dialog = $('#scenario-dialog');
+$$('.scenario-more').forEach(button => button.addEventListener('click', () => {
+  const number = Number(button.dataset.scenario);
+  const info = scenarios[number];
+  if (!info || !dialog) return;
+  $('#dialog-id').textContent = `SC–${String(number).padStart(2, '0')} / ESCENARIO DE SEGURIDAD`;
+  $('#dialog-title').textContent = info.name;
+  $('#dialog-description').textContent = info.description;
+  $('#dialog-action').textContent = info.action;
+  $('#dialog-proof').textContent = info.proof;
+  $('#dialog-mitre').textContent = info.mitre;
+  if (dialog.showModal) {
+    dialog.showModal();
+    document.body.classList.add('dialog-open');
+  }
+}));
+const closeDialog = () => dialog?.close();
+$('#close-dialog')?.addEventListener('click', closeDialog);
+$('#dialog-accept')?.addEventListener('click', closeDialog);
+dialog?.addEventListener('close', () => document.body.classList.remove('dialog-open'));
+dialog?.addEventListener('click', event => { if (event.target === dialog) closeDialog(); });
+
+let toastId;
+function showToast(message) {
+  const toast = $('#toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toastId);
+  toastId = setTimeout(() => toast.classList.remove('show'), 3600);
+}
+$('#share-site')?.addEventListener('click', async () => {
+  const data = {title: 'CyberShield | Seguridad visible, respuesta verificable', text: 'Conoce CyberShield y sus 8 escenarios de ciberseguridad.', url: location.href.split('#')[0]};
+  if (navigator.share && /^https?:/.test(location.protocol)) {
+    try { await navigator.share(data); return; } catch (error) { if (error.name === 'AbortError') return; }
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    try { await navigator.clipboard.writeText(data.url); showToast('Enlace copiado. ¡Compártelo!'); return; } catch { /* mostrar enlace manualmente */ }
+  }
+  showToast('Copia la dirección de esta página desde tu navegador.');
+});
+$('#current-year').textContent = new Date().getFullYear();
