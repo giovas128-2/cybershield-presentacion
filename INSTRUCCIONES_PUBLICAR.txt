@@ -1,0 +1,38 @@
+CYBERSHIELD | PUBLICAR LA PAGINA Y CREAR SU CODIGO QR
+===================================================
+
+1. DESCOMPRIME este ZIP (no lo subas como ZIP).
+2. Entra a github.com y crea un REPOSITORIO NUEVO llamado:
+   cybershield-presentacion
+   Selecciona Public.
+3. Abre el nuevo repositorio.
+4. Haz clic en Add file > Upload files.
+5. Arrastra los archivos EXTRAIDOS: index.html, styles.css,
+   app.js, la carpeta assets y, si quieres, README.md,
+   .nojekyll y robots.txt.
+   IMPORTANTISIMO: index.html debe estar en la raiz, no dentro
+   de una carpeta CyberShield_Presentacion_Web.
+6. Haz clic en Commit changes.
+7. Abre Settings > Pages.
+8. Source: Deploy from a branch.
+9. Branch: main; Folder: /(root); Save.
+10. Espera a que GitHub termine de publicar y usa el enlace
+    que aparece en Settings > Pages.
+
+EJEMPLO DE URL (si el usuario es giovas128-2, AJUSTAR):
+https://TU_USUARIO.github.io/cybershield-presentacion/
+
+11. Abre esa URL en tu celular para comprobar que funciona.
+12. Copia la URL de GitHub Pages a un generador de codigos QR,
+    o compartela en ChatGPT para obtener un QR listo para imprimir.
+
+NO USES para el QR:
+- https://github.com/... (abre el repositorio, no la pagina)
+- http://localhost/... (solo funciona en tu computadora)
+- Una URL ficticia o sin comprobar
+
+NOTAS:
+- Esta pagina NO necesita backend, PostgreSQL ni iniciar WSL.
+- Las personas escanean el QR y ven el sitio desde internet.
+- NO subas contrasenas, archivos .env, tokens o IPs de tu red.
+- No subas tu proyecto principal; esta pagina va en otro repositorio.
