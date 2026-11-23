@@ -1,0 +1,28 @@
+CYBERSHIELD — PAGINA ONE SCREEN PARA EL CODIGO QR
+=================================================
+
+1. Descarga el ZIP y descomprímelo.
+2. Abre tu repositorio de presentacion en GitHub.
+3. Sube o reemplaza directamente en la RAIZ:
+   index.html
+   styles.css
+   app.js
+   assets/logo-cybershield.webp
+   assets/favicon.png
+   .nojekyll (opcional)
+4. Settings > Pages > Deploy from a branch > main > /(root) > Save.
+5. Visita la URL HTTPS que GitHub Pages te muestre.
+6. Usa esa URL para generar tu codigo QR.
+
+Si ya habias generado un QR con el mismo enlace del repositorio,
+NO necesitas generar uno nuevo por cambiar el diseño.
+
+COMO SE USA
+- Los 8 escenarios aparecen en el primer vistazo.
+- Toca una tarjeta para leer su descripcion y evidencia.
+- El menu superior muestra funciones, tecnologia y preguntas
+  sin bajar por una pagina larga.
+- En el celular, el detalle aparece sobre la pantalla y se cierra
+  pulsando Entendido o X.
+
+Es un sitio INFORMATIVO estatico; no requiere FastAPI ni PostgreSQL.

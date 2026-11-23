@@ -1,74 +1,42 @@
-# CyberShield · Página de presentación para QR
+# CyberShield | Micrositio de presentación de una pantalla
 
-Esta es una página informativa de CyberShield para una exposición escolar. Se puede publicar directamente en GitHub Pages **sin instalar nada**. Está construida con HTML, CSS y JavaScript, incluye filtros interactivos, fichas de ocho escenarios y es adaptable a celulares.
+**Versión visual basada en el logotipo oficial:** negro, cian luminoso, azul petróleo y plata. La imagen del logo se incluye en `assets/logo-cybershield.webp`.
 
-## Contenido
+## Cómo abrir el sitio
 
-- `index.html`: página principal (es el archivo que GitHub Pages abre).
-- `styles.css`: diseño y adaptación a celulares.
-- `app.js`: interacciones de la página.
-- `assets/favicon.svg`: icono de CyberShield.
-- `.nojekyll`: evita procesamientos de Jekyll que no son necesarios.
+Abre `index.html` en Chrome o Edge. Funciona sin instalar dependencias ni tener un backend en ejecución. El sitio es informativo: NO se conecta con las bases de datos o servicios del proyecto CyberShield.
 
-**Importante:** sube estos archivos a la raíz del repositorio. No subas únicamente el ZIP. Tampoco subas código del backend, base de datos, archivos `.env`, contraseñas ni claves temporales de la práctica.
+## Cómo subirlo a GitHub Pages
 
-## Publicar en GitHub Pages (pasos sencillos)
+### Si ya publicaste la versión anterior
 
-1. Accede a https://github.com e inicia sesión.
-2. Pulsa `+` → **New repository**.
-3. Nombre recomendado: `cybershield-presentacion` (puedes usar otro).
-4. Selecciona **Public** y crea el repositorio. Usa un repositorio **nuevo**, independiente del backend.
-5. En el repositorio, entra a **Add file → Upload files**.
-6. Arrastra **el contenido** de esta carpeta: `index.html`, `styles.css`, `app.js`, `assets/`, `.nojekyll` y opcionalmente `README.md`.
-7. Comprueba que el archivo `index.html` está en la raíz. Si el navegador no permite subir carpetas en tu flujo, puedes usar GitHub Desktop o la alternativa Git descrita abajo.
-8. Pulsa **Commit changes**.
-9. Abre **Settings → Pages**.
-10. En **Build and deployment → Source** elige **Deploy from a branch**.
-11. En **Branch** selecciona `main` y `/(root)`, después **Save**.
-12. En esa misma pantalla de Pages aparecerá la URL pública cuando termine la publicación. Abre la URL para confirmar que funciona.
+1. Abre el repositorio de GitHub donde subiste la página anterior.
+2. Reemplaza en la **raíz** los archivos `index.html`, `styles.css` y `app.js`; sube también la carpeta `assets` con `logo-cybershield.webp` y `favicon.png`.
+3. Conserva la publicación **Settings → Pages → Deploy from a branch → main → /(root)**.
+4. Recarga el sitio con Ctrl+F5. **El enlace anterior sigue siendo el mismo**, así que tu código QR no necesita cambiar.
 
-URL orientativa si el usuario es `giovas128-2` y el repositorio se llama `cybershield-presentacion`:
+### Si es tu primer repositorio
 
-`https://giovas128-2.github.io/cybershield-presentacion/`
+1. Crea un repositorio **público** nuevo, por ejemplo `cybershield-presentacion`.
+2. En **Add file → Upload files**, sube **el contenido descomprimido** de este ZIP, no el ZIP: `index.html`, `styles.css`, `app.js` y `assets/` deben quedar en la raíz.
+3. En **Settings → Pages** elige **Deploy from a branch**, rama `main`, carpeta `/(root)`.
+4. Abre la URL que GitHub muestre, normalmente `https://TU-USUARIO.github.io/cybershield-presentacion/`.
+5. Usa esa URL en el código QR de tu exposición.
 
-Este patrón es solo un ejemplo: **la URL real se confirma en Settings → Pages**.
+## Cómo se presenta
 
-## Alternativa para subir todo desde Windows usando Git
+- La página no tiene desplazamiento vertical general. El resumen y los ocho escenarios se ven de inmediato en la pantalla.
+- Las cuatro pestañas superiores cambian el contenido visible: Escenarios, Funciones, Tecnología y Conócenos.
+- Pulsa un escenario para ver cómo funciona y qué evidencia conserva; en teléfono se abre una ficha flotante.
+- **Compartir** permite enviar/copiar el enlace una vez publicado.
 
-Desde PowerShell, una vez descargados y extraídos los archivos de esta carpeta, crea el repositorio vacío en GitHub y ejecuta (sustituye `TU_USUARIO`):
+**Nota de precisión:** las explicaciones describen el sistema académico y los ocho escenarios de demostración que la usuaria ha verificado en su laboratorio. La página no muestra telemetría en vivo, ni implica que los rechazos del receptor sean bloqueos reales de una red corporativa.
 
-```powershell
-cd "$env:USERPROFILE\Downloads\CyberShield_Presentacion_Web"
-git init
-git add .
-git commit -m "Publicar presentación de CyberShield"
-git branch -M main
-git remote add origin https://github.com/TU_USUARIO/cybershield-presentacion.git
-git push -u origin main
-```
+## Estructura
 
-GitHub puede solicitar inicio de sesión. La carpeta del comando depende de dónde extraigas el ZIP.
-
-## Crear un código QR
-
-1. Primero confirma que la página abre con la URL pública de GitHub Pages desde un celular.
-2. Copia **esa URL pública**, no la URL del repositorio ni `localhost`.
-3. Pega esa URL en un generador de códigos QR, o compártela en este chat para crear un QR imprimible.
-4. Escanea el QR con otro teléfono antes de imprimirlo para comprobar que abre la página.
-
-## Consejos para presentar
-
-- Puedes mostrar el sitio directamente desde un teléfono como si un visitante hubiera escaneado el QR.
-- Los ocho escenarios cuentan con fichas que puedes abrir tocando **Ver detalles**.
-- El gráfico de portada es una **representación visual del proceso**, no un panel conectado en tiempo real.
-- El sitio no necesita conexión con el backend para abrir: solo GitHub Pages y acceso a internet para los visitantes.
-- Los estilos tienen fuentes de respaldo y funcionan sin bibliotecas externas de JavaScript.
-- Al compartir el proyecto públicamente, evita colocar IPs de tu red, usuarios, claves o capturas con datos sensibles.
-
-## Ver en tu computadora antes de publicar
-
-Haz doble clic en `index.html`. La web funciona localmente en Chrome, Edge y Firefox. Los botones, filtros y tarjetas también funcionan en local.
-
-## Alcance
-
-CyberShield es una plataforma académica de monitoreo y respuesta defensiva para entornos autorizados. Este sitio comunica el flujo y las capacidades presentadas en el proyecto, sin acceso a información privada o sistemas externos.
+- `index.html`: contenido y elementos visuales
+- `styles.css`: diseño responsive de una pantalla
+- `app.js`: pestañas, fichas de escenarios y compartir enlace
+- `assets/logo-cybershield.webp`: logotipo proporcionado por el equipo
+- `assets/favicon.png`: icono del navegador
+- `.nojekyll`: publicación sencilla de archivos estáticos en GitHub Pages
